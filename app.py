@@ -29,6 +29,8 @@ def start_processing(i_path,o_dir,resize,rename,re_w,re_h,ext,frame,face_clip):
     else:
         processing_video(i_path,o_dir,re_w,re_h,ext,frame,frame)
 
+    messagebox.showinfo("完了","処理が完了しました。")
+
 
 def processing_img(i_dir,o_dir,resize,rename,re_w,re_h,ext,face_clip):
     if len(i_dir) != 0 and len(o_dir) != 0 and i_dir != o_dir:
@@ -40,9 +42,6 @@ def processing_img(i_dir,o_dir,resize,rename,re_w,re_h,ext,face_clip):
                 name = os.path.basename(f)
                 if rename: name = str(i).zfill(5) + ext
                 cv2.imwrite(os.path.join(o_dir,name),img)
-        messagebox.showinfo("完了","処理が完了しました。")
-    else:
-        messagebox.showinfo("エラー","処理を中断しました。")
 
 def processing_video(i_file,o_dir,re_w,re_h,ext,frame_rate,face_clip):
     cap = cv2.VideoCapture(i_file)
@@ -60,9 +59,10 @@ def processing_video(i_file,o_dir,re_w,re_h,ext,frame_rate,face_clip):
                 if(face_clip):
                     frame = f_clip.face_clip(frame,resize_width=int(re_w),resize_height=int(re_h))
                     if  len(frame) != 0:
-                        filename = str(num).zfill(5) + ext
-                        cv2.imwrite(os.path.join(o_dir,filename),frame)
-                        num += 1
+                        for img in frame:
+                            filename = str(num).zfill(5) + ext
+                            cv2.imwrite(os.path.join(o_dir,filename),img)
+                            num += 1
             cnt += 1
         else:
             return
@@ -185,7 +185,7 @@ label_frame =tk.Label(frame_frame,text="Frame",font=DEF_FONT)
 label_frame.pack(side='left',padx=5)
 box_frame= tk.Entry(frame_frame, width=5,font=DEF_FONT)
 box_frame.pack(side='left',padx=5)
-box_frame.insert(tk.END,30)
+box_frame.insert(tk.END,60)
 
 # Progress
 frame_progress = tk.Frame(root)

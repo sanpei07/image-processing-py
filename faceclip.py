@@ -28,15 +28,16 @@ def face_clip(img,resize_width = 128, resize_height = 128):
         return ret
 
     # 成功したら切り取り
+    ret = []
     for (x, y, w, h) in face_list:
         print("顔の座標 = ", x, y, w, h)
-
-    top = y
-    bottom = y + h
-    left = x
-    right = x + w
-    image_ret = image_raw[top:bottom,left:right]
-    ret = cv2.resize(image_ret,dsize = (resize_width,resize_height))
+        top = y
+        bottom = y + h
+        left = x
+        right = x + w
+        image_ret = image_raw[top:bottom,left:right]
+        ret_img = cv2.resize(image_ret,dsize = (resize_width,resize_height))
+        ret.append(ret_img)
 
     return ret
 
