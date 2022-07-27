@@ -23,16 +23,16 @@ def open_filedialog():
     file_path = filedialog.askopenfilename()
     return file_path
 
-def start_processing(i_path,o_dir,resize,rename,re_w,re_h,ext,frame,face_clip):
+def start_processing(i_path,o_dir,resize,rename,re_w,re_h,ext,frame,face_clip,prefix):
     if(os.path.isdir(i_path)):
-        processing_img(i_path,o_dir,resize,rename,re_w,re_h,ext)
+        processing_img(i_path,o_dir,resize,rename,re_w,re_h,ext,prefix)
     else:
-        processing_video(i_path,o_dir,re_w,re_h,ext,frame,frame)
+        processing_video(i_path,o_dir,re_w,re_h,ext,frame,face_clip,prefix)
 
     messagebox.showinfo("完了","処理が完了しました。")
 
 
-def processing_img(i_dir,o_dir,resize,rename,re_w,re_h,ext,face_clip):
+def processing_img(i_dir,o_dir,resize,rename,re_w,re_h,ext,face_clip,prefix):
     if len(i_dir) != 0 and len(o_dir) != 0 and i_dir != o_dir:
         files = glob.glob(i_dir+ "/*")
         for i, f in enumerate(files):
@@ -40,10 +40,10 @@ def processing_img(i_dir,o_dir,resize,rename,re_w,re_h,ext,face_clip):
                 img=cv2.imread(f)
                 if resize: img = cv2.resize(img, dsize=(int(re_w), int(re_h)))
                 name = os.path.basename(f)
-                if rename: name = str(i).zfill(5) + ext
+                if rename: name = prefix + "_" + str(i).zfill(5) + ext
                 cv2.imwrite(os.path.join(o_dir,name),img)
 
-def processing_video(i_file,o_dir,re_w,re_h,ext,frame_rate,face_clip):
+def processing_video(i_file,o_dir,re_w,re_h,ext,frame_rate,face_clip,prefix):
     cap = cv2.VideoCapture(i_file)
     start_num = len(glob.glob(o_dir+ "/*"))
 
@@ -60,7 +60,7 @@ def processing_video(i_file,o_dir,re_w,re_h,ext,frame_rate,face_clip):
                     frame = f_clip.face_clip(frame,resize_width=int(re_w),resize_height=int(re_h))
                     if  len(frame) != 0:
                         for img in frame:
-                            filename = str(num).zfill(5) + ext
+                            filename = prefix + "_" + str(num).zfill(5) + ext
                             cv2.imwrite(os.path.join(o_dir,filename),img)
                             num += 1
             cnt += 1
@@ -95,8 +95,9 @@ def click_start():
     flg_rename = bln_rename.get()
     frame = box_frame.get()
     face_clip = bln_face_clip.get()
+    prefix = box_prefix.get()
 
-    start_processing(i_dir,o_dir,flg_resize,flg_rename,re_w,re_h,ext,frame,face_clip)
+    start_processing(i_dir,o_dir,flg_resize,flg_rename,re_w,re_h,ext,frame,face_clip,prefix)
 
 
 
@@ -164,11 +165,17 @@ bln_rename.set(True)
 check_rename = tk.Checkbutton(frame03,variable=bln_rename, text='ReName', font=DEF_FONT)
 check_rename.pack(side='left',padx=5)
 
+box_prefix = tk.Entry(frame03, width=5,font=DEF_FONT)
+box_prefix.pack(side='left',padx=5)
+
 text_extension = tk.StringVar()
 text_extension.set('.png')
 list_extension= ('.png', '.jpg')
 select_extension = ttk.Combobox(frame03,state="readonly",font=DEF_FONT,values=list_extension, textvariable=text_extension)
 select_extension.pack(side='left',padx=5)
+
+
+
 
 # FaceClip
 frame04 = tk.Frame(root)
